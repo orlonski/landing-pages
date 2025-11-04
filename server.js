@@ -334,20 +334,20 @@ app.get('/health', (req, res) => {
   });
 });
 
-// Rota para limpar cache (útil para desenvolvimento)
-app.get('/admin/clear-cache', (req, res) => {
+// Rota para limpar cache (útil para desenvolvimento) - protegida
+app.get('/admin/clear-cache', requireAuth, (req, res) => {
   cache.clear();
-  res.json({ 
+  res.json({
     message: 'Cache limpo com sucesso',
     timestamp: new Date().toISOString()
   });
 });
 
-// Rota para limpar cache de uma página específica
-app.get('/admin/clear-cache/:slug', (req, res) => {
+// Rota para limpar cache de uma página específica - protegida
+app.get('/admin/clear-cache/:slug', requireAuth, (req, res) => {
   const { slug } = req.params;
   const deleted = cache.delete(slug);
-  res.json({ 
+  res.json({
     message: deleted ? `Cache de "${slug}" limpo` : `"${slug}" não estava em cache`,
     timestamp: new Date().toISOString()
   });
@@ -450,9 +450,8 @@ app.get('/lp/:slug', requireAuth, async (req, res) => {
   }
 });
 
-// Rota raiz (opcional)
-app.get('/', (req, res) => {
-  const isLoggedIn = req.session && req.session.userId;
+// Rota raiz (protegida com autenticação)
+app.get('/', requireAuth, (req, res) => {
   const userName = req.session?.userName || 'Usuário';
 
   res.send(`
@@ -548,27 +547,18 @@ app.get('/', (req, res) => {
     </head>
     <body>
       <div class="container">
-        ${isLoggedIn ? `
-          <div class="user-info">
-            <span>👤 ${userName}</span>
-            <a href="/logout" class="logout-btn">Sair</a>
-          </div>
-          <div class="status logged-in">✓ Autenticado</div>
-        ` : `
-          <div class="status logged-out">✗ Não autenticado</div>
-        `}
+        <div class="user-info">
+          <span>👤 ${userName}</span>
+          <a href="/logout" class="logout-btn">Sair</a>
+        </div>
+        <div class="status logged-in">✓ Autenticado</div>
 
         <h1>🚀 Landing Pages Server</h1>
         <p>Servidor rodando com sucesso!</p>
 
-        ${isLoggedIn ? `
-          <p>Para acessar uma landing page, use:</p>
-          <div class="code">/lp/seu-slug-aqui</div>
-          <p class="info">Exemplo: <a href="/lp/exemplo">/lp/exemplo</a></p>
-        ` : `
-          <p>Faça login para acessar as landing pages</p>
-          <p><a href="/login">Ir para login</a></p>
-        `}
+        <p>Para acessar uma landing page, use:</p>
+        <div class="code">/lp/seu-slug-aqui</div>
+        <p class="info">Exemplo: <a href="/lp/exemplo">/lp/exemplo</a></p>
       </div>
     </body>
     </html>
