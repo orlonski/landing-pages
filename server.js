@@ -558,7 +558,7 @@ app.get('/', requireAuth, (req, res) => {
 
         <p>Para acessar uma landing page, use:</p>
         <div class="code">/lp/seu-slug-aqui</div>
-        <p class="info">Exemplo: <a href="/lp/exemplo">/lp/exemplo</a></p>
+        <p class="info">Exemplo: <a href="/lp/86ab1yrdt">/lp/86ab1yrdt</a></p>
       </div>
     </body>
     </html>
